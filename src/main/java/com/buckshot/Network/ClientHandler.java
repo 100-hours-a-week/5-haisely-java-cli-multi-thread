@@ -7,11 +7,8 @@ import java.net.*;
 public class ClientHandler implements Runnable {
     private Socket socket;
     private PrintWriter writer;
-    private NetworkUser user;
-
-    public ClientHandler(Socket socket, NetworkUser user) {
+    public ClientHandler(Socket socket) {
         this.socket = socket;
-        this.user = user;
     }
 
     @Override

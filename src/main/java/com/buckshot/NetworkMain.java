@@ -29,8 +29,9 @@ public class NetworkMain {
                 Socket socket = serverSocket.accept();
                 System.out.println("New client connected");
 
-                ClientHandler clientHandler = new ClientHandler(socket, players[i]);
+                ClientHandler clientHandler = new ClientHandler(socket);
                 playerThreads[i] = new Thread(clientHandler);
+                players[i].setHandler(playerThreads[i]);
                 playerThreads[i].start();
             }
 
@@ -44,8 +45,8 @@ public class NetworkMain {
     }
 
 
-    public void game(NetworkUser player1, NetworkUser player2, Gun gun, ClientHandler p1thread, ClientHandler p2thread){
-        NetworkGameManager gm = new NetworkGameManager(player1, player2, gun, p1thread, p2thread);
+    public void game(NetworkUser player1, NetworkUser player2, Gun gun){
+        NetworkGameManager gm = new NetworkGameManager(player1, player2, gun);
         try {
             gm.startGame();
             for (int i = 0; i < 10; i++) {
