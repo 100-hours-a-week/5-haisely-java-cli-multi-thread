@@ -4,7 +4,7 @@ package com.buckshot.Network;
 import com.buckshot.Core.User;
 
 public class NetworkUser extends User {
-    private Thread handler;
+    private ClientHandler handler;
 
     @Override
     public void myTurn(){
@@ -16,11 +16,11 @@ public class NetworkUser extends User {
 
     }
 
-    public Thread getHandler() {
+    public ClientHandler getHandler() {
         return handler;
     }
 
-    public void setHandler(Thread handler) {
+    public void setHandler(ClientHandler handler) {
         this.handler = handler;
     }
 }

@@ -1,6 +1,7 @@
 package com.buckshot;
 import java.io.*;
 import java.net.Socket;
+import java.util.Base64;
 import java.util.Scanner;
 
 public class ClientMain {
@@ -20,7 +21,8 @@ public class ClientMain {
                 try {
                     String serverResponse;
                     while ((serverResponse = in.readLine()) != null) {
-                        System.out.println("Server: \n" + serverResponse);
+                        byte[] decodedBytes = Base64.getDecoder().decode(serverResponse);
+                        System.out.println("Server: " + new String(decodedBytes));
                     }
                 } catch (IOException e) {
                     System.out.println("Error reading from server: " + e.getMessage());
