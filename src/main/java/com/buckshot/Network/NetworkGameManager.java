@@ -7,6 +7,8 @@ import com.buckshot.Manager.GameManager;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.InputMismatchException;
 
 public class NetworkGameManager extends GameManager {
@@ -32,18 +34,9 @@ public class NetworkGameManager extends GameManager {
                 p2.setName(playerName2);
                 System.out.println(p2.getName());
                 broadcastMessage("Player 1의 이름 : "+p1.getName() +"\nPlayer 2의 이름 : "+p2.getName()+"\n");
+                randomItems(p1);
+                randomItems(p2);
                 return;
-//                AsciiArt.printCenteredString("Player 1: " + playerName1 + '\n', 0);
-//                AsciiArt.sleepMillis(500);
-//                AsciiArt.printCenteredStringPretty("Player 2의 이름을 작성하세요.", 3);
-//                AsciiArt.printCenteredString("   >  ", 8);
-//                String playerName2 = scanner.nextLine();
-//                p2.setName(playerName2);
-//                AsciiArt.printCenteredString("Player 2: " + playerName2 + '\n', 0);
-//                AsciiArt.sleepMillis(500);
-//                randomItems(p1);
-//                randomItems(p2);
-//                return;
             } catch (InputMismatchException e) {
                 System.out.println("잘못된 입력입니다.");
             } catch (Exception e) {
@@ -57,12 +50,41 @@ public class NetworkGameManager extends GameManager {
 
     @Override
     public void startRound(){
-
+        broadcastMessage(this.round + " Round가 시작됩니다.\n");
+        AsciiArt.sleepMillis(1000);
+        randomBullets(this.gun);
+        this.round +=1;
     }
 
     @Override
     public void drawGame(){
 
+    }
+
+    @Override
+    public void randomBullets(Gun gun){
+        ArrayList<Integer> newBullets = new ArrayList<Integer>();
+        int num = 3+(int)(Math.random()*6);
+        int limit = (int)(num/3);
+        int real = limit + (int)(Math.random()*(num-2*limit+1));
+        broadcastMessage("총알이 "+num+" 개 장전됩니다.\n");
+        AsciiArt.sleepMillis(1000);
+
+        for (int i = 0; i<num; i++){
+            if(i<real){
+                newBullets.add(1);
+            }else{
+                newBullets.add(0);
+            }
+            broadcastMessage("찰칵\n");
+            AsciiArt.sleepMillis(230);
+        }
+        AsciiArt.sleepMillis(270);
+        broadcastMessage("실탄 "+real+" 개, 공포탄 "+ (num-real)+"개가 장전되었습니다.\n");
+        AsciiArt.sleepMillis(2000);
+        Collections.shuffle(newBullets);
+        gun.setBullets(newBullets);
+        return;
     }
 
     public void broadcastMessage(String message){

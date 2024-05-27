@@ -22,7 +22,7 @@ public class ClientMain {
                     String serverResponse;
                     while ((serverResponse = in.readLine()) != null) {
                         byte[] decodedBytes = Base64.getDecoder().decode(serverResponse);
-                        System.out.println("Server: " + new String(decodedBytes));
+                        System.out.println(new String(decodedBytes));
                     }
                 } catch (IOException e) {
                     System.out.println("Error reading from server: " + e.getMessage());
@@ -33,7 +33,6 @@ public class ClientMain {
 
             // 사용자 입력을 서버로 보냅니다.
             while (true) {
-                System.out.print("You: ");
                 String message = scanner.nextLine();
                 out.println(message);
             }
