@@ -111,7 +111,7 @@ public class NetworkGameManager extends GameManager {
             if(!user.getMyTurn() || gun.isEmptyBullet()){break;}
             String stateMessage =  AsciiArt.printState(this);
             broadcastMessage(stateMessage);
-            broadcastMessage("1. 아이템 사용 2. 나에게 쏘기 3. 적에게 쏘기");
+            user.getHandler().sendMessage("1. 아이템 사용 2. 나에게 쏘기 3. 적에게 쏘기");
             broadcastMessage(user.getName()+"의 입력을 기다리고 있습니다...");
             try {
                 String optionMessage = user.getHandler().readMessage();
