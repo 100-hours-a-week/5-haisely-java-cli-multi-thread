@@ -12,9 +12,10 @@ public abstract class UserItem extends Item {
         System.out.println(this.netMessage);
     };
     @Override
-    public void use(){
+    public String use(){
         decribeItem();
         useUser(this.target);
         describeUser();
+        return this.netMessage;
     }
 }

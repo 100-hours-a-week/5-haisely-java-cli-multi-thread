@@ -16,13 +16,9 @@ public class Knife extends GunItem {
         setGunDamage(gun);
     }
 
-    @Override
-    public void describeGun(){
-        System.out.println("장착된 총알의 데미지가 "+this.damage+ "가 되었습니다!\n");
-    }
-
     private void setGunDamage(Gun gun){
         gun.setBulletDamage(this.damage);
+        this.netMessage = "장착된 총알의 데미지가 "+this.damage+ "가 되었습니다!\n";
     }
 
     public void setDamage(int d){

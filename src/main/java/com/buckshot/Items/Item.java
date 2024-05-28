@@ -4,7 +4,7 @@ public abstract class Item {
     String name;
     String description;
     String netMessage;
-    public abstract void use();
+    public abstract String use();
 
 
     public String getName() {
