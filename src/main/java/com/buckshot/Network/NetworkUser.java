@@ -12,9 +12,7 @@ public class NetworkUser extends User {
         String message;
         Item i = items.get(index -1);
         message = this.name+"가 "+ i.getName()+"을 사용했습니다.\n";
-        AsciiArt.sleepMillis(1000);
         message += i.use();
-        AsciiArt.sleepMillis(1000);
         items.remove(index-1);
         return message;
     }

@@ -1,5 +1,7 @@
 package com.buckshot.Network;
 
+import com.buckshot.Manager.GameManager;
+
 import java.io.*;
 import java.net.*;
 import java.util.Base64;
@@ -10,6 +12,7 @@ public class ClientHandler implements Runnable {
     private BufferedReader reader;
     private final Object lock = new Object();
     private boolean isConnected;
+    private ClientHandler enemyThread;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -28,6 +31,12 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
+        try {
+            String message = _readMessage();
+            enemyThread.sendMessage("상대 : "+message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         // Implement any code needed to handle client communication
     }
 
@@ -58,5 +67,9 @@ public class ClientHandler implements Runnable {
 
     public void setSocket(Socket socket) {
         this.socket = socket;
+    }
+
+    public void setEnemyThread(ClientHandler thread){
+        this.enemyThread = thread;
     }
 }

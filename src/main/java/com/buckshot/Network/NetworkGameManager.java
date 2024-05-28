@@ -18,6 +18,8 @@ public class NetworkGameManager extends GameManager {
         super(p1, p2, gun);
         this.p1thread = p1thread;
         this.p2thread = p2thread;
+        this.p1thread.setEnemyThread(p2thread);
+        this.p2thread.setEnemyThread(p1thread);
     }
 
     @Override
@@ -33,6 +35,7 @@ public class NetworkGameManager extends GameManager {
                 String playerName2 = p2thread.readMessage();
                 p2.setName(playerName2);
                 System.out.println(p2.getName());
+                broadcastMessage(AsciiArt.start);
                 broadcastMessage("Player 1의 이름 : "+p1.getName() +"\nPlayer 2의 이름 : "+p2.getName()+"\n");
                 randomItems(p1);
                 randomItems(p2);
@@ -99,8 +102,9 @@ public class NetworkGameManager extends GameManager {
 
     public void userTurn(NetworkUser user){
         // 1. 아이템 사용 // 2. 나에게 쏘기 // 3. 적에게 쏘기
-        AsciiArt.sleepMillis(800);
+        AsciiArt.sleepMillis(500);
         broadcastMessage(user.getName() + "의 차례입니다.\n");
+        AsciiArt.sleepMillis(500);
         if(!user.getFree()){
             broadcastMessage(user.getName() + "가 수갑에 묶여있어 차례가 넘어갑니다.\n");
             user.setFree(true);
@@ -125,13 +129,15 @@ public class NetworkGameManager extends GameManager {
                         int index = Integer.parseInt(indexMessage);
                         String itemMessage = user.useNetItem(index);
                         broadcastMessage(itemMessage);
+                        AsciiArt.sleepMillis(1000);
                         break;
                     case 2:
                         broadcastMessage(user.getName() + "가 자신에게 총을 쏩니다.\n");
-                        AsciiArt.sleepMillis(500);
+                        AsciiArt.sleepMillis(1000);
                         boolean cur = gun.isReal();
                         String gunMessage =  gun.shoot(user);
                         broadcastMessage(gunMessage);
+                        AsciiArt.sleepMillis(1000);
                         if (cur) {
                             user.setMyTurn(false);
                             user.getEnemy().setMyTurn(true);
@@ -139,9 +145,10 @@ public class NetworkGameManager extends GameManager {
                         break;
                     case 3:
                         broadcastMessage(user.getName()+"가 " + user.getEnemy().getName() + "에게 총을 쏩니다.\n");
-                        AsciiArt.sleepMillis(500);
-                        String shootMessage =  gun.shoot(user.getEnemy());
+                        AsciiArt.sleepMillis(1000);
+                        String shootMessage =  gun.shoot(user.getEnemy());;
                         broadcastMessage(shootMessage);
+                        AsciiArt.sleepMillis(1000);
                         user.setMyTurn(false);
                         user.getEnemy().setMyTurn(true);
                         break;

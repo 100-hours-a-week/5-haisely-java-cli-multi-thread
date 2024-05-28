@@ -1,6 +1,8 @@
 package com.buckshot;
+
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Base64;
 import java.util.Scanner;
 
@@ -16,7 +18,6 @@ public class ClientMain {
 
             System.out.println("Connected to the server");
 
-            // 새로운 스레드를 시작하여 서버로부터 메시지를 읽습니다.
             Thread readThread = new Thread(() -> {
                 try {
                     String serverResponse;
@@ -24,9 +25,14 @@ public class ClientMain {
                         byte[] decodedBytes = Base64.getDecoder().decode(serverResponse);
                         System.out.println(new String(decodedBytes));
                     }
+                } catch (SocketException e) {
+                    System.out.println("Connection reset by server");
                 } catch (IOException e) {
                     System.out.println("Error reading from server: " + e.getMessage());
                     e.printStackTrace();
+                } finally {
+                    System.out.println("Server connection closed");
+                    System.exit(0);  // 프로그램을 안전하게 종료
                 }
             });
             readThread.start();

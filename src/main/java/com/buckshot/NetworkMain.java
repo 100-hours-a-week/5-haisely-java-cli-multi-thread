@@ -65,7 +65,6 @@ public class NetworkMain {
         NetworkGameManager gm = new NetworkGameManager(player1, player2, gun, p1, p2);
         try {
             gm.startGame();
-            gm.broadcastMessage(AsciiArt.start);
             for (int i = 0; i < 10; i++) {
                 gm.startRound();
                 while (gm.canTurn()) {
