@@ -8,11 +8,14 @@ public abstract class GunItem extends Item{
         this.gun = gun;
     }
     public abstract void useGun(Gun gun);
-    public abstract void describeGun();
+    public void describeGun(){
+        System.out.println(this.netMessage);
+    }
     @Override
-    public void use(){
+    public String use(){
         decribeItem();
         useGun(this.gun);
         describeGun();
+        return this.netMessage;
     }
 }

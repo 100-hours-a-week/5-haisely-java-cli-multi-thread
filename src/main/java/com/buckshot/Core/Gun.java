@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Gun {
     private ArrayList<Integer> bullets = new ArrayList<Integer>();
 
-    public void shoot(User target){
+    public String shoot(User target){
         int b = bullets.removeFirst();
         AsciiArt.printDot();
         if (b!=0){
@@ -17,7 +17,7 @@ public class Gun {
             AsciiArt.printCenteredString("틱...\n\n", 0);
         }
         AsciiArt.sleepMillis(500);
-        return;
+        return null;
     }
 
     public int removeBullet(){

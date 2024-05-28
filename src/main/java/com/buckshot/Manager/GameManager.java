@@ -10,9 +10,9 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class GameManager {
-    protected final User p1;
-    protected final User p2;
-    protected final Gun gun;
+    protected User p1;
+    protected User p2;
+    protected Gun gun;
     protected int round = 1;
     protected static final Scanner scanner = new Scanner(System.in);
 
@@ -26,7 +26,7 @@ public class GameManager {
         initializeGame();
     }
 
-    private void initializeGame(){
+    protected void initializeGame(){
         this.p1.setGun(gun);
         this.p2.setGun(gun);
         this.p1.setScanner(this.scanner);

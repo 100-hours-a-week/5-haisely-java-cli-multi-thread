@@ -15,16 +15,12 @@ public class Beer extends GunItem {
         dumpBullet(gun);
     }
 
-    @Override
-    public void describeGun(){
-        if (this.removed!=0){
-            System.out.println("실탄이 제거되었습니다.\n");
-        } else {
-            System.out.println("공포탄이 제거되었습니다\n");
-        }
-    }
-
     public void dumpBullet(Gun gun){
         this.removed = gun.removeBullet();
+        if (this.removed!=0){
+            this.netMessage = "실탄이 제거되었습니다.\n";
+        } else {
+            this.netMessage = "공포탄이 제거되었습니다\n";
+        }
     }
 }
