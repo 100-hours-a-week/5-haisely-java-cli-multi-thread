@@ -1,6 +1,7 @@
 package com.buckshot.Network;
 
 import com.buckshot.Core.Gun;
+import com.buckshot.Core.User;
 import com.buckshot.Manager.AsciiArt;
 import com.buckshot.Manager.GameManager;
 
@@ -85,6 +86,10 @@ public class NetworkGameManager extends GameManager {
         Collections.shuffle(newBullets);
         gun.setBullets(newBullets);
         return;
+    }
+
+    public void UserTurn(User user){
+
     }
 
     public void broadcastMessage(String message){

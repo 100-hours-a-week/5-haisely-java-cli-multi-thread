@@ -16,7 +16,7 @@ public class User {
     private Boolean isFree = true;
     private Boolean myTurn = true;
     private Scanner scanner;
-    private GameManager gm;
+    GameManager gm;
 
     public void useItem(int index){
         Item i = items.get(index -1);

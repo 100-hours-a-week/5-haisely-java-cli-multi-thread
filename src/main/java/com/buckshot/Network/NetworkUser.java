@@ -7,11 +7,6 @@ public class NetworkUser extends User {
     private ClientHandler handler;
 
     @Override
-    public void myTurn(){
-
-    }
-
-    @Override
     public void useItem(int index){
 
     }
