@@ -13,6 +13,8 @@ public class ClientHandler implements Runnable {
     private final Object lock = new Object();
     private boolean isConnected;
     private ClientHandler enemyThread;
+    private boolean readMessageFlag = false;
+    private volatile String message = null;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -32,15 +34,31 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            String message = _readMessage();
-            enemyThread.sendMessage("상대 : "+message);
-        } catch (IOException e) {
+            while (isConnected) {
+                String msg = _readMessage();
+                synchronized (lock) {
+                    if (!readMessageFlag) {
+                         enemyThread.sendMessage("상대 : " + msg);
+                    } else {
+                        message = msg;
+                        lock.notify();
+                        lock.wait();
+                    }
+                }
+            }
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
+        } finally {
+            try {
+                closeSocket();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        // Implement any code needed to handle client communication
     }
 
     public void closeSocket() throws IOException {
+        isConnected = false;
         socket.close();
     }
 
@@ -51,9 +69,13 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public String readMessage() throws SocketException, IOException {
+    public String readMessage() throws SocketException, IOException, InterruptedException {
         synchronized (lock) {
-            return _readMessage();
+            readMessageFlag = true;
+            lock.wait();
+            readMessageFlag = false;
+            lock.notify();
+            return message;
         }
     }
 
