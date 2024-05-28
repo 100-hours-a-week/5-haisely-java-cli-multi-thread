@@ -100,9 +100,8 @@ public class NetworkGameManager extends GameManager {
 
     public void userTurn(NetworkUser user){
         // 1. 아이템 사용 // 2. 나에게 쏘기 // 3. 적에게 쏘기
-        broadcastMessage(user.getName() + "의 차례입니다.\n");
         AsciiArt.sleepMillis(800);
-
+        broadcastMessage(user.getName() + "의 차례입니다.\n");
         if(!user.getFree()){
             broadcastMessage(user.getName() + "가 수갑에 묶여있어 차례가 넘어갑니다.\n");
             user.setFree(true);
@@ -116,6 +115,7 @@ public class NetworkGameManager extends GameManager {
             String stateMessage =  AsciiArt.printState(this);
             broadcastMessage(stateMessage);
             broadcastMessage("1. 아이템 사용 2. 나에게 쏘기 3. 적에게 쏘기");
+            broadcastMessage(user.getName()+"의 입력을 기다리고 있습니다...");
             try {
                 String optionMessage = user.getHandler().readMessage();
                 int option = Integer.parseInt(optionMessage);
@@ -140,7 +140,8 @@ public class NetworkGameManager extends GameManager {
                     case 3:
                         broadcastMessage(user.getName()+"가 " + user.getEnemy().getName() + "에게 총을 쏩니다.\n");
                         AsciiArt.sleepMillis(500);
-                        gun.shoot(user.getEnemy());
+                        String shootMessage =  gun.shoot(user.getEnemy());
+                        broadcastMessage(shootMessage);
                         user.setMyTurn(false);
                         user.getEnemy().setMyTurn(true);
                         break;

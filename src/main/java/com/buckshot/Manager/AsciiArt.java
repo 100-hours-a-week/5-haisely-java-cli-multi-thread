@@ -111,7 +111,7 @@ public class AsciiArt {
         return formatted;
     }
 
-    public static void printBang(){
+    public static String printBang(){
         String bang = "                                   ____  \",\n" +
                 "                                __,-~~/~    `---.\",\n" +
                 "                              _/_,---(      ,    )\",\n" +
@@ -126,6 +126,7 @@ public class AsciiArt {
                 "                                 (` ^'\\\"`-' \\\")\",\n" +
                 "                                    B A N G !!!\n";
         System.out.println(bang);
+        return bang;
     }
 
     public static void printDot(){

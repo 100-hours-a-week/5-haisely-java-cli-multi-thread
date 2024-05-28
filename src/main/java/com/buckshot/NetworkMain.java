@@ -41,6 +41,8 @@ public class NetworkMain {
         } catch (IOException e) {
             System.out.println("Server exception: " + e.getMessage());
             e.printStackTrace();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
         } finally {
             // Ensure all client sockets are closed
             for (int i = 0; i < MAX_CLIENTS; i++) {
@@ -49,6 +51,8 @@ public class NetworkMain {
                         players[i].getHandler().closeSocket();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
+                    } catch (Exception e){
+                        System.out.println(e.getMessage());
                     }
                 }
             }
@@ -60,28 +64,23 @@ public class NetworkMain {
         NetworkGameManager gm = new NetworkGameManager(player1, player2, gun, p1, p2);
         try {
             gm.startGame();
-            gm.startRound();
-            gm.userTurn(player1);
-            gm.userTurn(player2);
-//            for (int i = 0; i < 10; i++) {
-//                gm.startRound();
-//                while (gm.canTurn()) {
-//                    if (player1.getMyTurn()) {
-//                        player1.myTurn();
-//                    }
-//                    if (!gm.canTurn()) break;
-//                    player2.myTurn();
-//                }
-//                if (!gm.canRound()) {
-//                    gm.endGame();
-//                    return;
-//                }
-//            }
-//            gm.drawGame();
+            for (int i = 0; i < 10; i++) {
+                gm.startRound();
+                while (gm.canTurn()) {
+                    if (player1.getMyTurn()) {
+                        gm.userTurn(player1);
+                    }
+                    if (!gm.canTurn()) break;
+                    gm.userTurn(player2);
+                }
+                if (!gm.canRound()) {
+                    gm.endGame();
+                    return;
+                }
+            }
+            gm.drawGame();
         } catch (Exception e){
             System.out.println(e.getMessage());
-        }finally {
-            gm.scannerClose();
         }
     }
 }

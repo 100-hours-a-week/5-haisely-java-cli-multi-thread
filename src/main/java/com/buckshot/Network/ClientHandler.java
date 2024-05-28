@@ -1,5 +1,4 @@
 package com.buckshot.Network;
-import com.buckshot.Core.User;
 
 import java.io.*;
 import java.net.*;
@@ -9,9 +8,12 @@ public class ClientHandler implements Runnable {
     private Socket socket;
     private PrintWriter writer;
     private BufferedReader reader;
-    private String currentMessage;
+    private final Object lock = new Object();
+    private boolean isConnected;
+
     public ClientHandler(Socket socket) {
         this.socket = socket;
+        this.isConnected = true;
         try {
             InputStream input = socket.getInputStream();
             this.reader = new BufferedReader(new InputStreamReader(input));
@@ -20,29 +22,44 @@ public class ClientHandler implements Runnable {
         } catch (IOException e) {
             System.out.println("Error setting up streams: " + e.getMessage());
             e.printStackTrace();
+            this.isConnected = false;
         }
     }
 
     @Override
     public void run() {
+        // Implement any code needed to handle client communication
     }
 
     public void closeSocket() throws IOException {
         socket.close();
     }
+
     public void sendMessage(String message) {
-        String encodedMessage = Base64.getEncoder().encodeToString(message.getBytes());
-        writer.println(encodedMessage);
+        if (isConnected) {
+            String encodedMessage = Base64.getEncoder().encodeToString(message.getBytes());
+            writer.println(encodedMessage);
+        }
     }
 
-    public String readMessage(){
-        try {
-            return reader.readLine();
-        } catch (IOException e) {
-            System.out.println("Error reading message: " + e.getMessage());
-            e.printStackTrace();
+    public String readMessage() {
+        synchronized (lock) {
+            try {
+                return _readMessage();
+            } catch (SocketException e) {
+                System.out.println("Connection reset: " + e.getMessage());
+                this.isConnected = false;
+            } catch (IOException e) {
+                System.out.println("Error reading message: " + e.getMessage());
+                e.printStackTrace();
+                this.isConnected = false;
+            }
+            return null;
         }
-        return null;
+    }
+
+    private String _readMessage() throws IOException {
+        return reader.readLine();
     }
 
     public Socket getSocket() {
