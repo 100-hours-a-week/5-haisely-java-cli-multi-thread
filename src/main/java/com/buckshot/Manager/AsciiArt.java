@@ -55,7 +55,7 @@ public class AsciiArt {
         System.out.print(output);
     }
 
-    public static void printState(GameManager gm){
+    public static String printState(GameManager gm){
         String base =
                 "--------------------------------------------------------------------------------\n" +
                 "player 1                                                               player 2\n" +
@@ -69,6 +69,7 @@ public class AsciiArt {
                 "%s                                                                    %s\n";
         String formatted = getGameInfo(gm, base);
         System.out.println(formatted);
+        return formatted;
     }
 
     private static String getGameInfo(GameManager gm, String base) {

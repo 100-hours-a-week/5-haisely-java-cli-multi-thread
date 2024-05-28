@@ -15,7 +15,7 @@ import java.util.InputMismatchException;
 public class NetworkGameManager extends GameManager {
     private ClientHandler p1thread;
     private ClientHandler p2thread;
-    public NetworkGameManager(NetworkUser p1, NetworkUser p2, Gun gun, ClientHandler p1thread, ClientHandler p2thread) {
+    public NetworkGameManager(NetworkUser p1, NetworkUser p2, NetworkGun gun, ClientHandler p1thread, ClientHandler p2thread) {
         super(p1, p2, gun);
         this.p1thread = p1thread;
         this.p2thread = p2thread;
@@ -45,7 +45,6 @@ public class NetworkGameManager extends GameManager {
             }
         }
         System.out.println("정상적으로 게임이 시작되지 않아 종료합니다.");
-        scannerClose();
         System.exit(1); // 프로그램 종료
     }
 
@@ -59,7 +58,18 @@ public class NetworkGameManager extends GameManager {
 
     @Override
     public void drawGame(){
+        AsciiArt.sleepMillis(500);
+        broadcastMessage("무승부입니다!");
+    }
 
+    @Override
+    public void endGame(){
+        AsciiArt.sleepMillis(500);
+        if (p1.getHealth()<=0){
+            broadcastMessage(p2.getName() +"가 승리했습니다!\n");
+        } else{
+            broadcastMessage(p2.getName() +"가 승리했습니다!\n");
+        }
     }
 
     @Override
@@ -88,8 +98,65 @@ public class NetworkGameManager extends GameManager {
         return;
     }
 
-    public void UserTurn(User user){
+    public void userTurn(NetworkUser user){
+        // 1. 아이템 사용 // 2. 나에게 쏘기 // 3. 적에게 쏘기
+        broadcastMessage(user.getName() + "의 차례입니다.\n");
+        AsciiArt.sleepMillis(800);
 
+        if(!user.getFree()){
+            broadcastMessage(user.getName() + "가 수갑에 묶여있어 차례가 넘어갑니다.\n");
+            user.setFree(true);
+            user.getEnemy().setMyTurn(true);
+            AsciiArt.sleepMillis(1000);
+            return;
+        }
+
+        for(int i = 0; i<10; i++){
+            if(!user.getMyTurn() || gun.isEmptyBullet()){break;}
+            String stateMessage =  AsciiArt.printState(this);
+            broadcastMessage(stateMessage);
+            broadcastMessage("1. 아이템 사용 2. 나에게 쏘기 3. 적에게 쏘기");
+            try {
+                String optionMessage = user.getHandler().readMessage();
+                int option = Integer.parseInt(optionMessage);
+                switch (option) {
+                    case 1:
+                        user.getHandler().sendMessage("아이템을 선택하세요.");
+                        String indexMessage = user.getHandler().readMessage();
+                        int index = Integer.parseInt(indexMessage);
+                        user.useItem(index);
+                        break;
+                    case 2:
+                        broadcastMessage(user.getName() + "가 자신에게 총을 쏩니다.\n");
+                        AsciiArt.sleepMillis(500);
+                        boolean cur = gun.isReal();
+                        String gunMessage =  gun.shoot(user);
+                        broadcastMessage(gunMessage);
+                        if (cur) {
+                            user.setMyTurn(false);
+                            user.getEnemy().setMyTurn(true);
+                        }
+                        break;
+                    case 3:
+                        broadcastMessage(user.getName()+"가 " + user.getEnemy().getName() + "에게 총을 쏩니다.\n");
+                        AsciiArt.sleepMillis(500);
+                        gun.shoot(user.getEnemy());
+                        user.setMyTurn(false);
+                        user.getEnemy().setMyTurn(true);
+                        break;
+                    default:
+                        user.getHandler().sendMessage("잘못된 입력입니다.");
+                        break;
+                }
+            }catch (NumberFormatException | IndexOutOfBoundsException e) {
+                user.getHandler().sendMessage("잘못된 입력입니다.");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        System.out.println("턴을 너무 많이 사용하여, 턴이 종료됩니다.");
+        user.setMyTurn(false);
+        user.getEnemy().setMyTurn(true);
     }
 
     public void broadcastMessage(String message){
