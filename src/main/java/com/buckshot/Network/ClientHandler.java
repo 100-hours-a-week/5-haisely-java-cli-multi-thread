@@ -42,23 +42,13 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public String readMessage() {
+    public String readMessage() throws SocketException, IOException {
         synchronized (lock) {
-            try {
-                return _readMessage();
-            } catch (SocketException e) {
-                System.out.println("Connection reset: " + e.getMessage());
-                this.isConnected = false;
-            } catch (IOException e) {
-                System.out.println("Error reading message: " + e.getMessage());
-                e.printStackTrace();
-                this.isConnected = false;
-            }
-            return null;
+            return _readMessage();
         }
     }
 
-    private String _readMessage() throws IOException {
+    private String _readMessage() throws SocketException, IOException {
         return reader.readLine();
     }
 

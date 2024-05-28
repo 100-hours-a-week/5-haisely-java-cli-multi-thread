@@ -5,6 +5,8 @@ import com.buckshot.Manager.AsciiArt;
 import com.buckshot.Manager.GameManager;
 
 
+import java.io.IOException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.InputMismatchException;
@@ -121,7 +123,8 @@ public class NetworkGameManager extends GameManager {
                         user.getHandler().sendMessage("아이템을 선택하세요.");
                         String indexMessage = user.getHandler().readMessage();
                         int index = Integer.parseInt(indexMessage);
-                        user.useItem(index);
+                        String itemMessage = user.useNetItem(index);
+                        broadcastMessage(itemMessage);
                         break;
                     case 2:
                         broadcastMessage(user.getName() + "가 자신에게 총을 쏩니다.\n");

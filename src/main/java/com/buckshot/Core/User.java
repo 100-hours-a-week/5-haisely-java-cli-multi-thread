@@ -9,14 +9,14 @@ import java.util.Scanner;
 
 public class User {
     private int health =6;
-    private String name;
-    private ArrayList<Item> items = new ArrayList<Item>();
+    protected String name;
+    protected ArrayList<Item> items = new ArrayList<Item>();
     private Gun gun;
     private User enemy;
     private Boolean isFree = true;
     private Boolean myTurn = true;
     private Scanner scanner;
-    GameManager gm;
+    protected GameManager gm;
 
     public void useItem(int index){
         Item i = items.get(index -1);
