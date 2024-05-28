@@ -16,9 +16,9 @@ public class User {
     private Boolean isFree = true;
     private Boolean myTurn = true;
     private Scanner scanner;
-    private GameManager gm;
+    GameManager gm;
 
-    private void useItem(int index){
+    public void useItem(int index){
         Item i = items.get(index -1);
         System.out.println(this.name+"가 "+ i.getName()+"을 사용했습니다.");
         AsciiArt.sleepMillis(1000);

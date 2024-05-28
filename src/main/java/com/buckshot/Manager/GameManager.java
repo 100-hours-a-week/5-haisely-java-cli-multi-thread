@@ -10,11 +10,11 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class GameManager {
-    private final User p1;
-    private final User p2;
-    private final Gun gun;
-    private int round = 1;
-    private static final Scanner scanner = new Scanner(System.in);
+    protected final User p1;
+    protected final User p2;
+    protected final Gun gun;
+    protected int round = 1;
+    protected static final Scanner scanner = new Scanner(System.in);
 
     final int ITEM_COUNT = 4;
     final int ITEM_NUMBER = 5;
