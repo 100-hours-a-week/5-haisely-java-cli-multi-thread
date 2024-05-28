@@ -1,13 +1,10 @@
 package com.buckshot.Network;
 
 import com.buckshot.Core.Gun;
-import com.buckshot.Core.User;
 import com.buckshot.Manager.AsciiArt;
 import com.buckshot.Manager.GameManager;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.InputMismatchException;

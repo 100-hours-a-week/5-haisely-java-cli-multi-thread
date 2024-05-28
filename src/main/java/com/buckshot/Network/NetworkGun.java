@@ -12,7 +12,7 @@ public class NetworkGun extends Gun {
         if (b!=0) {
 
             target.changeHealth(-b);
-            return("bang!!\n");
+            return(AsciiArt.printBang());
         }
         return("틱...\n");
     }

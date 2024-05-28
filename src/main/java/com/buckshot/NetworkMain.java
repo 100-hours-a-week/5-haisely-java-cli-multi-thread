@@ -2,6 +2,7 @@ package com.buckshot;
 
 import com.buckshot.Core.Gun;
 import com.buckshot.Core.User;
+import com.buckshot.Manager.AsciiArt;
 import com.buckshot.Manager.GameManager;
 import com.buckshot.Network.ClientHandler;
 import com.buckshot.Network.NetworkGameManager;
@@ -64,6 +65,7 @@ public class NetworkMain {
         NetworkGameManager gm = new NetworkGameManager(player1, player2, gun, p1, p2);
         try {
             gm.startGame();
+            gm.broadcastMessage(AsciiArt.start);
             for (int i = 0; i < 10; i++) {
                 gm.startRound();
                 while (gm.canTurn()) {
