@@ -1,14 +1,9 @@
 package com.buckshot;
 
-import com.buckshot.Core.Gun;
-import com.buckshot.Core.User;
-import com.buckshot.Manager.AsciiArt;
-import com.buckshot.Manager.GameManager;
 import com.buckshot.Network.ClientHandler;
 import com.buckshot.Network.NetworkGameManager;
 import com.buckshot.Network.NetworkGun;
 import com.buckshot.Network.NetworkUser;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -18,11 +13,18 @@ public class NetworkMain {
     private static final int MAX_CLIENTS = 2;
     private static NetworkUser[] players = new NetworkUser[MAX_CLIENTS];
     private static Thread[] playerThreads = new Thread[MAX_CLIENTS];
+    private static volatile boolean serverRunning = true;
 
     public static void main(String[] args) {
         players[0] = new NetworkUser();
         players[1] = new NetworkUser();
         NetworkGun gun = new NetworkGun();
+
+        Thread.UncaughtExceptionHandler handler = (thread, throwable) -> {
+            System.out.println("Exception in thread: " + thread.getName() + " - " + throwable.getMessage());
+            throwable.printStackTrace();
+            stopServer();
+        };
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Server is listening on port " + PORT);
@@ -32,7 +34,9 @@ public class NetworkMain {
                 System.out.println("New client connected");
 
                 ClientHandler clientHandler = new ClientHandler(socket);
-                playerThreads[i] = new Thread(clientHandler);
+                Thread thread = new Thread(clientHandler);
+                thread.setUncaughtExceptionHandler(handler);
+                playerThreads[i] = thread;
                 players[i].setHandler(clientHandler);
                 playerThreads[i].start();
             }
@@ -42,22 +46,25 @@ public class NetworkMain {
         } catch (IOException e) {
             System.out.println("Server exception: " + e.getMessage());
             e.printStackTrace();
-        }catch (Exception e){
-            System.out.println(e.getMessage());
         } finally {
-            // Ensure all client sockets are closed
-            for (int i = 0; i < MAX_CLIENTS; i++) {
-                if (players[i].getHandler() != null) {
-                    try {
-                        players[i].getHandler().closeSocket();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    } catch (Exception e){
-                        System.out.println(e.getMessage());
-                    }
+            stopServer();
+        }
+    }
+
+    private static void stopServer() {
+        if (!serverRunning) return;
+        serverRunning = false;
+        System.out.println("Stopping the server...");
+        for (int i = 0; i < MAX_CLIENTS; i++) {
+            if (players[i].getHandler() != null) {
+                try {
+                    players[i].getHandler().closeSocket();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
+        System.exit(0);
     }
 
 

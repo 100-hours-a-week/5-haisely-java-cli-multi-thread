@@ -1,7 +1,5 @@
 package com.buckshot.Network;
 
-import com.buckshot.Manager.GameManager;
-
 import java.io.*;
 import java.net.*;
 import java.util.Base64;
@@ -36,9 +34,12 @@ public class ClientHandler implements Runnable {
         try {
             while (isConnected) {
                 String msg = _readMessage();
+                if (msg == null) {
+                    break;  // 연결이 끊어졌음을 감지하면 루프를 탈출
+                }
                 synchronized (lock) {
                     if (!readMessageFlag) {
-                         enemyThread.sendMessage("상대 : " + msg);
+                        enemyThread.sendMessage("상대 : " + msg);
                     } else {
                         message = msg;
                         lock.notify();
@@ -47,7 +48,7 @@ public class ClientHandler implements Runnable {
                 }
             }
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().getUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
         } finally {
             try {
                 closeSocket();
@@ -63,7 +64,7 @@ public class ClientHandler implements Runnable {
     }
 
     public void sendMessage(String message) {
-        if (isConnected) {
+        if (isConnected && message != null) {
             String encodedMessage = Base64.getEncoder().encodeToString(message.getBytes());
             writer.println(encodedMessage);
         }
@@ -73,9 +74,10 @@ public class ClientHandler implements Runnable {
         synchronized (lock) {
             readMessageFlag = true;
             lock.wait();
+            String mess = this.message;
             readMessageFlag = false;
             lock.notify();
-            return message;
+            return mess;
         }
     }
 
@@ -83,15 +85,7 @@ public class ClientHandler implements Runnable {
         return reader.readLine();
     }
 
-    public Socket getSocket() {
-        return socket;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
-    }
-
-    public void setEnemyThread(ClientHandler thread){
+    public void setEnemyThread(ClientHandler thread) {
         this.enemyThread = thread;
     }
 }
