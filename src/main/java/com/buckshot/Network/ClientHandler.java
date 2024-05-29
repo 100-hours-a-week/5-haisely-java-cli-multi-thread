@@ -10,6 +10,9 @@ public class ClientHandler implements Runnable {
     private BufferedReader reader;
     private final Object lock = new Object();
     private boolean isConnected;
+    private ClientHandler enemyThread;
+    private boolean readMessageFlag = false;
+    private volatile String message = null;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -28,23 +31,53 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        // Implement any code needed to handle client communication
+        try {
+            while (isConnected) {
+                String msg = _readMessage();
+                if (msg == null) {
+                    break;  // 연결이 끊어졌음을 감지하면 루프를 탈출
+                }
+                synchronized (lock) {
+                    if (!readMessageFlag) {
+                        enemyThread.sendMessage("상대 : " + msg);
+                    } else {
+                        message = msg;
+                        lock.notify();
+                        lock.wait();
+                    }
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            Thread.currentThread().getUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
+        } finally {
+            try {
+                closeSocket();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void closeSocket() throws IOException {
+        isConnected = false;
         socket.close();
     }
 
     public void sendMessage(String message) {
-        if (isConnected) {
+        if (isConnected && message != null) {
             String encodedMessage = Base64.getEncoder().encodeToString(message.getBytes());
             writer.println(encodedMessage);
         }
     }
 
-    public String readMessage() throws SocketException, IOException {
+    public String readMessage() throws SocketException, IOException, InterruptedException {
         synchronized (lock) {
-            return _readMessage();
+            readMessageFlag = true;
+            lock.wait();
+            String mess = this.message;
+            readMessageFlag = false;
+            lock.notify();
+            return mess;
         }
     }
 
@@ -52,11 +85,7 @@ public class ClientHandler implements Runnable {
         return reader.readLine();
     }
 
-    public Socket getSocket() {
-        return socket;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
+    public void setEnemyThread(ClientHandler thread) {
+        this.enemyThread = thread;
     }
 }
