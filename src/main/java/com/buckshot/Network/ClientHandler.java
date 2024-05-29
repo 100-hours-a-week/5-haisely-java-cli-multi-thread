@@ -35,6 +35,7 @@ public class ClientHandler implements Runnable {
             while (isConnected) {
                 String msg = _readMessage();
                 if (msg == null) {
+                    this.isConnected = false;
                     break;  // 연결이 끊어졌음을 감지하면 루프를 탈출
                 }
                 synchronized (lock) {
