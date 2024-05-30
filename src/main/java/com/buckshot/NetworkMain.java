@@ -45,7 +45,6 @@ public class NetworkMain {
             game(players[0], players[1], gun, players[0].getHandler(), players[1].getHandler());
         } catch (IOException e) {
             System.out.println("Server exception: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             stopServer();
         }
@@ -54,7 +53,16 @@ public class NetworkMain {
     private static void stopServer() {
         if (!serverRunning) return;
         serverRunning = false;
-        System.out.println("Stopping the server...");
+        try {
+            if (!players[0].getHandler().isConnected()) {
+                players[1].getHandler().sendMessage("상대 플레이어가 떠나 게임이 종료됩니다.");
+            } else if (!players[1].getHandler().isConnected()) {
+                players[0].getHandler().sendMessage("상대 플레이어가 떠나 게임이 종료됩니다.");
+            }
+        } catch (Exception e) {
+            System.out.println("Server exception: " + e.getMessage());
+        }
+
         for (int i = 0; i < MAX_CLIENTS; i++) {
             if (players[i].getHandler() != null) {
                 try {
@@ -74,15 +82,19 @@ public class NetworkMain {
             gm.startGame();
             for (int i = 0; i < 10; i++) {
                 gm.startRound();
-                while (gm.canTurn()) {
+                while (gm.canTurn()&&gm.isConnectedUsers()) {
                     if (player1.getMyTurn()) {
                         gm.userTurn(player1);
                     }
-                    if (!gm.canTurn()) break;
+                    if (!gm.canTurn()||!gm.isConnectedUsers()) break;
                     gm.userTurn(player2);
                 }
                 if (!gm.canRound()) {
                     gm.endGame();
+                    return;
+                }
+                if (!gm.isConnectedUsers()){
+                    gm.handleDisconnection();
                     return;
                 }
             }

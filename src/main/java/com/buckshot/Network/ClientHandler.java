@@ -14,7 +14,7 @@ public class ClientHandler implements Runnable {
     private boolean readMessageFlag = false;
     private volatile String message = null;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket) throws IOException{
         this.socket = socket;
         this.isConnected = true;
         try {
@@ -35,8 +35,11 @@ public class ClientHandler implements Runnable {
             while (isConnected) {
                 String msg = _readMessage();
                 if (msg == null) {
-                    this.isConnected = false;
-                    break;  // 연결이 끊어졌음을 감지하면 루프를 탈출
+                    closeSocket();
+                    synchronized (lock) {
+                        lock.notify();
+                    }
+                    throw new IOException("Socket disconnected");
                 }
                 synchronized (lock) {
                     if (!readMessageFlag) {
@@ -50,7 +53,8 @@ public class ClientHandler implements Runnable {
             }
         } catch (IOException | InterruptedException e) {
             Thread.currentThread().getUncaughtExceptionHandler().uncaughtException(Thread.currentThread(), e);
-        } finally {
+        }
+        finally {
             try {
                 closeSocket();
             } catch (IOException e) {
@@ -65,20 +69,22 @@ public class ClientHandler implements Runnable {
     }
 
     public void sendMessage(String message) {
-        if (isConnected && message != null) {
-            String encodedMessage = Base64.getEncoder().encodeToString(message.getBytes());
-            writer.println(encodedMessage);
-        }
+        String encodedMessage = Base64.getEncoder().encodeToString(message.getBytes());
+        writer.println(encodedMessage);
     }
 
     public String readMessage() throws SocketException, IOException, InterruptedException {
         synchronized (lock) {
             readMessageFlag = true;
             lock.wait();
-            String mess = this.message;
+            String msg = this.message;
+            if (msg == null) {
+                closeSocket();
+                throw new IOException();
+            }
             readMessageFlag = false;
             lock.notify();
-            return mess;
+            return msg;
         }
     }
 
@@ -88,5 +94,9 @@ public class ClientHandler implements Runnable {
 
     public void setEnemyThread(ClientHandler thread) {
         this.enemyThread = thread;
+    }
+
+    public boolean isConnected() {
+        return isConnected;
     }
 }
