@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.InputMismatchException;
 
+import static java.lang.System.exit;
+
 public class NetworkGameManager extends GameManager {
     private ClientHandler p1thread;
     private ClientHandler p2thread;
@@ -42,12 +44,16 @@ public class NetworkGameManager extends GameManager {
                 return;
             } catch (InputMismatchException e) {
                 System.out.println("잘못된 입력입니다.");
-            } catch (Exception e) {
+            } catch (IOException e){
+               handleDisconnection();
+               exit(0);
+            }
+            catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
         System.out.println("정상적으로 게임이 시작되지 않아 종료합니다.");
-        System.exit(1); // 프로그램 종료
+        exit(1); // 프로그램 종료
     }
 
     @Override
@@ -170,6 +176,22 @@ public class NetworkGameManager extends GameManager {
     public void broadcastMessage(String message){
         p1thread.sendMessage(message);
         p2thread.sendMessage(message);
+    }
+
+    public boolean isConnectedUsers(){
+        return (p1thread.isConnected()&& p2thread.isConnected());
+    }
+
+    public void handleDisconnection() {
+        try {
+            if (!p1thread.isConnected()) {
+                p2thread.sendMessage("상대 플레이어가 떠나 게임이 종료됩니다.");
+            } else if (!p2thread.isConnected()) {
+                p1thread.sendMessage("상대 플레이어가 떠나 게임이 종료됩니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
