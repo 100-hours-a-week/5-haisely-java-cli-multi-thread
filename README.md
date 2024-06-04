@@ -8,7 +8,7 @@
 
 > **‘카카오 클라우드 스쿨 in Jeju’를 진행하며 제작한 CLI 프로그램입니다.**
 >
-- **프로젝트 이름** : Buckshot Roulette
+- **프로젝트 이름** : TCP 통신을 사용한 Buckshot Roulette
 - **원작** : [Buckshot Roulette (steam)](https://store.steampowered.com/app/2835570/Buckshot_Roulette/?l=koreana)
 - **프로젝트 개발 기간** : 2024.05.16 ~
 - **개발 언어** : Java 21
@@ -16,10 +16,18 @@
 
 ## 프로젝트 실행 방법
 
+서버 실행
 ```
 cd 5-haisely-java-cli/src/main/java
-javac com/buckshot/Main.java
-java com.buckshot.Main
+javac com/buckshot/NetworkMain.java
+java com.buckshot.NetworkMain
+```
+
+클라이언트 실행
+```
+cd 5-haisely-java-cli/src/main/java
+javac com/buckshot/ClientMain.java
+java com.buckshot.ClientMain
 ```
 
 
